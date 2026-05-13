@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "super-chart.fullname" . }}
+  namespace: {{ .Values.namespace | default "game" }}
+  annotations:
+    # service.beta.kubernetes.io/aws-load-balancer-type: external
+    # service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    # service.beta.kubernetes.io/aws-load-balancer-scheme: {{ .Values.service.scheme | default "internal" }}
+    # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+  labels:
+    {{- include "super-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+  selector:
+    {{- include "super-chart.selectorLabels" . | nindent 4 }}
