@@ -1,22 +1,54 @@
-{{- if .Values.ingress.enabled -}}
+{{/* 
+  GLOBAL 
+*/}}
+{{- $global := .Values -}}
+{{- $fullName := include "super-chart.fullname" . -}}
+{{- $appName := include "super-chart.name" . -}}
+{{- $chart := include "super-chart.chart" . -}}
+{{- $chartName := .Chart.Name -}}
+{{- $chartVersion := .Chart.Version -}}
+{{- $chartAppVersion := .Chart.AppVersion -}}
+{{- $releaseName := .Release.Name -}}
+{{- $releaseService := .Release.Service -}}
+{{/*
+  TEMPLATE
+*/}}
+{{- if hasKey .Values "deployments" }}
+  {{- range .Values.deployments }}
+    {{- $deployment := . -}}
+    {{- if hasKey . "containers" }}
+      {{- range .containers }}
+        {{- $container := . -}}
+        {{- $svcPort := .service.port -}}
+        {{- if hasKey . "ingress" }}
+          {{- if hasKey .ingress "enabled" }}
+            {{- if .ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "super-chart.fullname" . }}
-  namespace: {{ .Values.namespace | default "game" }}
+  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  namespace: {{ $global.namespace | default "dev" }}
   labels:
-    {{- include "super-chart.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+    {{- if $chartAppVersion }}
+    app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $releaseService }}
+  {{- if hasKey .ingress "annotations" }}
+    {{- with .ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- end }}
 spec:
-  {{- with .Values.ingress.className }}
+  {{- with .ingress.className }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- if .ingress.tls }}
   tls:
-    {{- range .Values.ingress.tls }}
+    {{- range .ingress.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -25,7 +57,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range .ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
@@ -36,9 +68,18 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ include "super-chart.fullname" $ }}
+                name: {{ $chartName }}{{ printf "-%s" $container.name | default "" }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  number: {{ $svcPort }}
           {{- end }}
     {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
+{{/*
+  END TEMPLATE
+*/}}

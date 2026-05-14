@@ -1,33 +1,65 @@
-{{- if .Values.autoscaling.enabled }}
+{{/* 
+  GLOBAL 
+*/}}
+{{- $global := .Values -}}
+{{- $fullName := include "super-chart.fullname" . -}}
+{{- $appName := include "super-chart.name" . -}}
+{{- $chart := include "super-chart.chart" . -}}
+{{- $chartName := .Chart.Name -}}
+{{- $chartVersion := .Chart.Version -}}
+{{- $chartAppVersion := .Chart.AppVersion -}}
+{{- $releaseName := .Release.Name -}}
+{{- $releaseService := .Release.Service -}}
+{{/*
+  TEMPLATE
+*/}}
+{{- if hasKey .Values "deployments" }}
+  {{- range .Values.deployments }}
+    {{- if hasKey . "autoscaling" }}
+      {{- if hasKey .autoscaling "enabled" }}
+        {{- if .autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "super-chart.fullname" . }}
-  namespace: {{ .Values.namespace | default "game" }}
+  name: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+  namespace: {{ $global.namespace | default "dev" }}
   labels:
-    {{- include "super-chart.labels" . | nindent 4 }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+    {{- if $chartAppVersion }}
+    app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $releaseService }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: Deployment
-    name: {{ include "super-chart.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+    kind: {{ .kind | default "Deployment" }}
+    name: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+  minReplicas: {{ .autoscaling.minReplicas }}
+  maxReplicas: {{ .autoscaling.maxReplicas }}
   metrics:
-    {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if .autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+          averageUtilization: {{ .autoscaling.targetCPUUtilizationPercentage }}
     {{- end }}
-    {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- if .autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+          averageUtilization: {{ .autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
+{{/*
+  END TEMPLATE
+*/}}

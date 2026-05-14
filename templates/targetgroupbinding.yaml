@@ -1,24 +1,74 @@
-{{- if .Values.targetGroupBinding.enabled }}
-# https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/targetgroupbinding/spec
+{{/* 
+  GLOBAL 
+*/}}
+{{- $global := .Values -}}
+{{- $fullName := include "super-chart.fullname" . -}}
+{{- $appName := include "super-chart.name" . -}}
+{{- $chart := include "super-chart.chart" . -}}
+{{- $chartName := .Chart.Name -}}
+{{- $chartVersion := .Chart.Version -}}
+{{- $chartAppVersion := .Chart.AppVersion -}}
+{{- $releaseName := .Release.Name -}}
+{{- $releaseService := .Release.Service -}}
+{{/*
+  TEMPLATE
+  # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/targetgroupbinding/spec
+*/}}
+{{- if hasKey .Values "deployments" }}
+  {{- range .Values.deployments }}
+    {{- $deployment := . -}}
+    {{- if hasKey . "containers" }}
+      {{- range .containers }}
+        {{- $container := . -}}
+        {{- if hasKey . "targetGroupBinding" }}
+          {{- if hasKey .targetGroupBinding "enabled" }}
+            {{- if .targetGroupBinding.enabled -}}
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:
-  name: {{ include "super-chart.fullname" . }}
-  namespace: {{ .Values.namespace | default "game" }}
+  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  namespace: {{ $global.namespace | default "dev" }}
+  labels:
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+    {{- if $chartAppVersion }}
+    app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $releaseService }}
 spec:
   serviceRef:
-    name: {{ include "super-chart.fullname" . }}
-    port: {{ .Values.service.port }}
+    name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+    port: {{ .service.port }}
   networking:
     ingress:
       - from:
-          - securityGroup: 
-              groupID: {{ .Values.targetGroupBinding.securityGroup }}
+          - securityGroup:
+              groupID: {{ .targetGroupBinding.securityGroup }}
         ports:
           - port: http
             protocol: TCP
-          - port: {{ .Values.service.port }}
+          - port: {{ .service.port }}
             protocol: TCP
+          {{- if hasKey .service "extraPorts" }}
+            {{- range .service.extraPorts }}
+              {{- if hasKey . "enabled" }}
+                {{- if .enabled }}
+          - port: {{ .port }}
+            protocol: {{ .protocol }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
   targetType: ip
-  targetGroupARN: {{ .Values.targetGroupBinding.arn }}
+  targetGroupARN: {{ .targetGroupBinding.arn }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
+{{/*
+  END TEMPLATE
+*/}}

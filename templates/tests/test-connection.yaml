@@ -1,10 +1,40 @@
+{{/* 
+  GLOBAL 
+*/}}
+{{- $global := .Values -}}
+{{- $fullName := include "super-chart.fullname" . -}}
+{{- $appName := include "super-chart.name" . -}}
+{{- $chart := include "super-chart.chart" . -}}
+{{- $chartName := .Chart.Name -}}
+{{- $chartVersion := .Chart.Version -}}
+{{- $chartAppVersion := .Chart.AppVersion -}}
+{{- $releaseName := .Release.Name -}}
+{{- $releaseService := .Release.Service -}}
+{{/*
+  TEMPLATE
+*/}}
+{{- if hasKey .Values "deployments" }}
+  {{- range .Values.deployments }}
+    {{- $deployment := . -}}
+    {{- if hasKey . "containers" }}
+      {{- range .containers }}
+        {{- $container := . -}}
+        {{- if hasKey . "service" }}
+          {{- if hasKey .service "enabled" }}
+            {{- if .service.enabled -}}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "super-chart.fullname" . }}-test-connection"
-  namespace: {{ .Values.namespace | default "game" }}
+  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  namespace: {{ $global.namespace | default "dev" }}
   labels:
-    {{- include "super-chart.labels" . | nindent 4 }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+    {{- if $chartAppVersion }}
+    app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $releaseService }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -12,5 +42,15 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "super-chart.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ $chartName }}{{ printf "-%s" .name | default "" }}:{{ .service.port }}']
   restartPolicy: Never
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{/*
+  END TEMPLATE
+*/}}

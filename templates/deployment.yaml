@@ -1,87 +1,177 @@
+{{/* 
+  GLOBAL 
+*/}}
+{{- $global := .Values -}}
+{{- $fullName := include "super-chart.fullname" . -}}
+{{- $appName := include "super-chart.name" . -}}
+{{- $chart := include "super-chart.chart" . -}}
+{{- $chartName := .Chart.Name -}}
+{{- $chartVersion := .Chart.Version -}}
+{{- $chartAppVersion := .Chart.AppVersion -}}
+{{- $releaseName := .Release.Name -}}
+{{- $releaseService := .Release.Service -}}
+{{- $labels := include "super-chart.labels" . -}}
+{{- $selectorLabels := include "super-chart.selectorLabels" . -}}
+{{/*
+  TEMPLATE
+*/}}
+{{- if hasKey .Values "deployments" }}
+  {{- range .Values.deployments }}
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ .kind | default "Deployment" }}
 metadata:
-  name: {{ include "super-chart.fullname" . }}
-  namespace: {{ .Values.namespace | default "game" }}
+  name: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+  namespace: {{ $global.namespace | default "dev" }}
   labels:
-    {{- include "super-chart.labels" . | nindent 4 }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+    {{- if $chartAppVersion }}
+    app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $releaseService }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if hasKey . "autoscaling" }}
+    {{- if hasKey .autoscaling "enabled" }}
+      {{- if not .autoscaling.enabled }}
+  replicas: {{ .replicaCount }}
+      {{- end }}
+    {{- else }}
+  replicas: {{ .replicaCount }}
+    {{- end }}
+  {{- else }}
+  replicas: {{ .replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "super-chart.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+      app.kubernetes.io/instance: {{ $releaseName }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- if hasKey . "podAnnotations" }}
+        {{- with .podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
       labels:
-        {{- include "super-chart.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
+        helm.sh/chart: {{ $chart }}
+        app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+        app.kubernetes.io/instance: {{ $releaseName }}
+        {{- if $chartAppVersion }}
+        app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+        {{- end }}
+        app.kubernetes.io/managed-by: {{ $releaseService }}
+        {{- if hasKey . "podLabels" }}
+          {{- with .podLabels }}
         {{- toYaml . | nindent 8 }}
+          {{- end }}
         {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with $global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "super-chart.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
+      serviceAccountName: {{ $fullName }}{{ printf "-%s" .name | default "" }}
+      {{- if hasKey . "podSecurityContext" }}
+        {{- with .podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
+      {{- if hasKey . "containers" }}
       containers:
-        - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
+        {{- range .containers }}
+        - name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+          {{- if hasKey . "securityContext" }}
+            {{- with .securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .image.repository }}:{{ .image.tag | default $chartVersion }}"
+          imagePullPolicy: {{ .image.pullPolicy | default "IfNotPresent" }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .service.port }}
               protocol: TCP
-          {{- with .Values.livenessProbe }}
+            {{- if hasKey .service "extraPorts" }}
+              {{- range .service.extraPorts }}
+                {{- if hasKey . "enabled" }}
+                  {{- if .enabled }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: {{ .protocol }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- if hasKey . "livenessProbe" }}
+            {{- with .livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
-          {{- with .Values.readinessProbe }}
+          {{- if hasKey . "readinessProbe" }}
+            {{- with .readinessProbe }}
           readinessProbe:
             {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
-          {{- with .Values.resources }}
           resources:
+          {{- if hasKey . "resources" }}
+            {{- with .resources }}
             {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- else }}
+            requests:
+              cpu: 250m
+              memory: 256Mi
           {{- end }}
-          {{- with .Values.volumeMounts }}
+          {{- if hasKey . "volumeMounts" }}
+            {{- with .volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
-      {{- with .Values.volumes }}
+        {{- end }}
+      {{- end }}
+      {{- if hasKey . "volumes" }}
+        {{- with .volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
-      {{- with .Values.nodeSelector }}
+      {{- if hasKey . "nodeSelector" }}
+        {{- with .nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
-      {{- if .Values.affinity.enabled }}
+      {{- if hasKey . "affinity" }}
+        {{- if hasKey .affinity "enabled" }}
+          {{- if .affinity.enabled }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: "app.kubernetes.io/name"
-                operator: In
-                values:
-                  - {{ include "super-chart.name" . }}
-            topologyKey: "kubernetes.io/hostname"
+            - labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                      - {{ $appName }}{{ printf "-%s" .name | default "" }}
+              topologyKey: "kubernetes.io/hostname"
+          {{- end }}
+        {{- end }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- if hasKey . "tolerations" }}
+        {{- with .tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
+  {{- end }}
+{{- end }}
+{{/*
+  END TEMPLATE
+*/}}

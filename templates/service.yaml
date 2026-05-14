@@ -1,19 +1,72 @@
+{{/* 
+  GLOBAL 
+*/}}
+{{- $global := .Values -}}
+{{- $fullName := include "super-chart.fullname" . -}}
+{{- $appName := include "super-chart.name" . -}}
+{{- $chart := include "super-chart.chart" . -}}
+{{- $chartName := .Chart.Name -}}
+{{- $chartVersion := .Chart.Version -}}
+{{- $chartAppVersion := .Chart.AppVersion -}}
+{{- $releaseName := .Release.Name -}}
+{{- $releaseService := .Release.Service -}}
+{{/*
+  TEMPLATE
+*/}}
+{{- if hasKey .Values "deployments" }}
+  {{- range .Values.deployments }}
+    {{- $deployment := . -}}
+    {{- if hasKey . "containers" }}
+      {{- range .containers }}
+        {{- $container := . -}}
+        {{- $svcPort := .service.port -}}
+        {{- if hasKey . "service" }}
+          {{- if hasKey .service "enabled" }}
+            {{- if .service.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "super-chart.fullname" . }}
-  namespace: {{ .Values.namespace | default "game" }}
+  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  namespace: {{ $global.namespace | default "dev" }}
+  {{- if hasKey .service "annotations" }}
+    {{- with .service.annotations }}
   annotations:
-    # service.beta.kubernetes.io/aws-load-balancer-type: external
-    # service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-    # service.beta.kubernetes.io/aws-load-balancer-scheme: {{ .Values.service.scheme | default "internal" }}
-    # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
   labels:
-    {{- include "super-chart.labels" . | nindent 4 }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+    {{- if $chartAppVersion }}
+    app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $releaseService }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .service.port }}
       targetPort: http
+    {{- if hasKey .service "extraPorts" }}
+      {{- range .service.extraPorts }}
+        {{- if hasKey . "enabled" }}
+          {{- if .enabled }}
+    - port: {{ .port }}
+      targetPort: {{ .port }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
   selector:
-    {{- include "super-chart.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{/*
+  END TEMPLATE
+*/}}

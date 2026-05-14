@@ -1,39 +1,78 @@
-{{- if .Values.httpRoute.enabled -}}
+{{/* 
+  GLOBAL 
+*/}}
+{{- $global := .Values -}}
 {{- $fullName := include "super-chart.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
+{{- $appName := include "super-chart.name" . -}}
+{{- $chart := include "super-chart.chart" . -}}
+{{- $chartName := .Chart.Name -}}
+{{- $chartVersion := .Chart.Version -}}
+{{- $chartAppVersion := .Chart.AppVersion -}}
+{{- $releaseName := .Release.Name -}}
+{{- $releaseService := .Release.Service -}}
+{{/*
+  TEMPLATE
+*/}}
+{{- if hasKey .Values "deployments" }}
+  {{- range .Values.deployments }}
+    {{- $deployment := . -}}
+    {{- if hasKey . "containers" }}
+      {{- range .containers }}
+        {{- $container := . -}}
+        {{- $svcPort := .service.port -}}
+        {{- if hasKey . "httpRoute" }}
+          {{- if hasKey .httpRoute "enabled" }}
+            {{- if .httpRoute.enabled -}}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: {{ $fullName }}
-  namespace: {{ .Values.namespace | default "game" }}
+  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  namespace: {{ $global.namespace | default "dev" }}
   labels:
-    {{- include "super-chart.labels" . | nindent 4 }}
-  {{- with .Values.httpRoute.annotations }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/instance: {{ $releaseName }}
+    {{- if $chartAppVersion }}
+    app.kubernetes.io/version: {{ $chartAppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $releaseService }}
+  {{- if hasKey .httpRoute "annotations" }}
+    {{- with .httpRoute.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- end }}
 spec:
   parentRefs:
-    {{- with .Values.httpRoute.parentRefs }}
+    {{- with .httpRoute.parentRefs }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.httpRoute.hostnames }}
+  {{- with .httpRoute.hostnames }}
   hostnames:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   rules:
-    {{- range .Values.httpRoute.rules }}
-    {{- with .matches }}
+    {{- range .httpRoute.rules }}
+      {{- with .matches }}
     - matches:
       {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .filters }}
+      {{- end }}
+      {{- with .filters }}
       filters:
       {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       backendRefs:
-        - name: {{ $fullName }}
+        - name: {{ $chartName }}{{ printf "-%s" $container.name | default "" }}
           port: {{ $svcPort }}
           weight: 1
     {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
+{{/*
+  END TEMPLATE
+*/}}
