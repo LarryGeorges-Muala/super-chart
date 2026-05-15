@@ -4,11 +4,11 @@
 
 > Handles multiple deployments and multiple containers per deployments
 
-```Go Template
+```Go
 dependencies:
 - name: super-chart
-  version: ">= 0.1.1"
-  repository: "https://github.com/LarryGeorges-Muala/super-chart"
+  version: ">=0.1.1"
+  repository: "https://larrygeorges-muala.github.io/super-chart"
 ```
 
-> Global config to use in [values.yaml](values.yaml)
+> Global config to use in [values.yaml](super-chart/values.yaml)
