@@ -1,6 +1,6 @@
 apiVersion: v2
 name: super-chart
-description: A Helm chart for Kubernetes
+description: "Super Helm chart re-usable and configurable for multi-services"
 
 # A chart can be either an 'application' or a 'library' chart.
 #
