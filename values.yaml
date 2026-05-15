@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-namespace: game
+namespace: ""
 
 imagePullSecrets: []
 
@@ -21,19 +21,19 @@ secrets: []
   #     config.json: configuration.json
 
 deployments:
-  - name: debug
+  - name: ""
     kind: Deployment
     replicaCount: 1
     containers:
-      - name: api
+      - name: ""
         targetGroupBinding:
           enabled: true
-          arn: "arn..."
-          securityGroup: "sg..."
+          arn: ""
+          securityGroup: ""
         image:
-          repository: public.ecr.aws/l6m2t8p7/docker-2048
+          repository: ""
           pullPolicy: IfNotPresent
-          tag: "latest"
+          tag: ""
         podAnnotations: {}
         podLabels: {}
         podSecurityContext: {}
@@ -66,15 +66,15 @@ deployments:
           enabled: true
           annotations: {}
           parentRefs:
-          - name: gateway
-            sectionName: http
+            - name: gateway
+              sectionName: http
           hostnames:
-          - super-chart.local
+            - super-chart.local
           rules:
-          - matches:
-            - path:
-                type: PathPrefix
-                value: /headers
+            - matches:
+              - path:
+                  type: PathPrefix
+                  value: /headers
         resources:
           requests:
             cpu: 500m
@@ -82,13 +82,13 @@ deployments:
         livenessProbe:
           exec:
             command:
-            - whoami
+              - whoami
           initialDelaySeconds: 15
           periodSeconds: 20
         readinessProbe:
           exec:
             command:
-            - whoami
+              - whoami
           initialDelaySeconds: 15
           periodSeconds: 20
         volumeMounts: []
@@ -110,6 +110,11 @@ deployments:
     nodeSelector: {}
 
     tolerations: []
+
+    volumeClaimTemplates:
+      name: ""
+      storageClassName: ""
+      storage: ""
 
     affinity:
       enabled: true

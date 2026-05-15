@@ -26,11 +26,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  name: {{ $fullName }}{{ printf "-%s" $deployment.name }}{{ printf "-%s" .name }}
   namespace: {{ $global.namespace | default "dev" }}
   labels:
     helm.sh/chart: {{ $chart }}
-    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name }}
     app.kubernetes.io/instance: {{ $releaseName }}
     {{- if $chartAppVersion }}
     app.kubernetes.io/version: {{ $chartAppVersion | quote }}
@@ -68,7 +68,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ $chartName }}{{ printf "-%s" $container.name | default "" }}
+                name: {{ $fullName }}{{ printf "-%s" $deployment.name }}{{ printf "-%s" $container.name }}
                 port:
                   number: {{ $svcPort }}
           {{- end }}

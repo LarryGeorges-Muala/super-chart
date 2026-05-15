@@ -26,7 +26,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  name: {{ $fullName }}{{ printf "-%s" $deployment.name }}{{ printf "-%s" .name }}
   namespace: {{ $global.namespace | default "dev" }}
   {{- if hasKey .service "annotations" }}
     {{- with .service.annotations }}
@@ -36,7 +36,7 @@ metadata:
   {{- end }}
   labels:
     helm.sh/chart: {{ $chart }}
-    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name }}
     app.kubernetes.io/instance: {{ $releaseName }}
     {{- if $chartAppVersion }}
     app.kubernetes.io/version: {{ $chartAppVersion | quote }}
@@ -58,7 +58,7 @@ spec:
       {{- end }}
     {{- end }}
   selector:
-    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name }}
     app.kubernetes.io/instance: {{ $releaseName }}
             {{- end }}
           {{- end }}

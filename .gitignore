@@ -66,3 +66,5 @@ __pycache__/
 # Helm
 get_helm.sh
 **/*get_helm.sh*
+*.tgz
+**/*.tgz

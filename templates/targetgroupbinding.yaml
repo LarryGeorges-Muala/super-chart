@@ -26,11 +26,11 @@
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:
-  name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+  name: {{ $fullName }}{{ printf "-%s" $deployment.name }}{{ printf "-%s" .name }}
   namespace: {{ $global.namespace | default "dev" }}
   labels:
     helm.sh/chart: {{ $chart }}
-    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name | default "" }}
+    app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name }}
     app.kubernetes.io/instance: {{ $releaseName }}
     {{- if $chartAppVersion }}
     app.kubernetes.io/version: {{ $chartAppVersion | quote }}
@@ -38,7 +38,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ $releaseService }}
 spec:
   serviceRef:
-    name: {{ $chartName }}{{ printf "-%s" .name | default "" }}
+    name: {{ $fullName }}{{ printf "-%s" $deployment.name }}{{ printf "-%s" .name }}
     port: {{ .service.port }}
   networking:
     ingress:
