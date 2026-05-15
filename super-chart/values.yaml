@@ -103,6 +103,7 @@ deployments:
       create: true
       automount: false
       annotations: {}
+      name: ""
 
     autoscaling:
       enabled: false
