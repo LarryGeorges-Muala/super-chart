@@ -26,8 +26,14 @@ deployments:
     replicaCount: 1
     containers:
       - name: ""
+        # startup:
+        #   enabled: false
+        #   command: ["/bin/sh", "-c"]
+        #   args:
+        #     - |
+        #       echo "Starting application...";
         targetGroupBinding:
-          enabled: true
+          enabled: false
           arn: ""
           securityGroup: ""
         image:
@@ -44,7 +50,7 @@ deployments:
           port: 80
           extraPorts:
             - name: https
-              enabled: true
+              enabled: false
               port: 443
               protocol: TCP
           annotations: {}
@@ -53,8 +59,8 @@ deployments:
             # service.beta.kubernetes.io/aws-load-balancer-scheme: {{ .service.scheme | default "internal" }}
             # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
         ingress:
-          enabled: true
-          className: "aws"
+          enabled: false
+          className: ""
           annotations: {}
           hosts:
             - host: super-chart.local
@@ -63,7 +69,7 @@ deployments:
                   pathType: ImplementationSpecific
           tls: []
         httpRoute:
-          enabled: true
+          enabled: false
           annotations: {}
           parentRefs:
             - name: gateway
@@ -99,7 +105,7 @@ deployments:
       annotations: {}
 
     autoscaling:
-      enabled: true
+      enabled: false
       minReplicas: 1
       maxReplicas: 100
       targetCPUUtilizationPercentage: 80
@@ -117,4 +123,4 @@ deployments:
       storage: ""
 
     affinity:
-      enabled: true
+      enabled: false

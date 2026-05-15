@@ -103,6 +103,21 @@ spec:
           {{- end }}
           image: "{{ .image.repository }}:{{ .image.tag | default $chartVersion }}"
           imagePullPolicy: {{ .image.pullPolicy | default "IfNotPresent" }}
+          {{- if hasKey . "startup" }}
+            {{- if hasKey .startup "enabled" }}
+              {{- if .startup.enabled }}
+                {{- if hasKey .startup "command" }}
+          command: {{ .startup.command }}
+                {{- end }}
+                {{- if hasKey .startup "args" }}
+                  {{- with .startup.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .service.port }}
