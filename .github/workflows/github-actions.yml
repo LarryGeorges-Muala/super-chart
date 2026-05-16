@@ -9,6 +9,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     env:
       TEST_NAME: "helm"
+      HELM_SET: "--set fullnameOverride={{ env.TEST_NAME }} --set deployments[0].name={{ env.TEST_NAME }} --set deployments[0].containers[0].name={{ env.TEST_NAME }}"
     steps:
       - name: Testing environment prep
         run: |
@@ -26,15 +27,15 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v6
 
-      - name: Set Multiline Env Var
-        run: |
-          {
-            echo "HELM_SET<<EOF"
-            echo "--set fullnameOverride={{ env.TEST_NAME }}"
-            echo "--set deployments[0].name={{ env.TEST_NAME }}"
-            echo "--set deployments[0].containers[0].name={{ env.TEST_NAME }}"
-            echo "EOF"
-          } >> "$GITHUB_ENV"
+      # - name: Set Multiline Env Var
+      #   run: |
+      #     {
+      #       echo "HELM_SET<<EOF"
+      #       echo "--set fullnameOverride={{ env.TEST_NAME }}"
+      #       echo "--set deployments[0].name={{ env.TEST_NAME }}"
+      #       echo "--set deployments[0].containers[0].name={{ env.TEST_NAME }}"
+      #       echo "EOF"
+      #     } >> "$GITHUB_ENV"
 
       - name: Lint - Chart
         run: |
