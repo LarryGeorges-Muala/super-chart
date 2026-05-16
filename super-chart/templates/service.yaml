@@ -21,7 +21,8 @@
           {{- with $container }}
             {{- if hasKey . "service" }}
               {{- if hasKey .service "enabled" }}
-                {{- if .service.enabled -}}
+                {{- if .service.enabled }}
+---
 apiVersion: v1
 kind: Service
 metadata:

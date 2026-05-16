@@ -22,7 +22,8 @@
           {{- with $container }}
             {{- if hasKey . "targetGroupBinding" }}
               {{- if hasKey .targetGroupBinding "enabled" }}
-                {{- if .targetGroupBinding.enabled -}}
+                {{- if .targetGroupBinding.enabled }}
+---
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:

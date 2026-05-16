@@ -1,6 +1,9 @@
 apiVersion: v2
 name: super-chart
 description: "Super Helm chart re-usable and configurable for multi-services"
+icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
+sources:
+- https://github.com/LarryGeorges-Muala/super-chart
 
 # A chart can be either an 'application' or a 'library' chart.
 #

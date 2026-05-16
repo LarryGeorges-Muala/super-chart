@@ -19,7 +19,7 @@
       {{- if hasKey . "containers" }}
         {{- range $container := .containers }}
           {{- with $container }}
-1. Get the application URL by running these commands:
+1. Get the {{ $fullName }}{{ printf "-%s" $deployment.name }}{{ printf "-%s" .name }} application URL by running these commands:
 {{- if contains "NodePort" .service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ $global.namespace | default "dev" }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullName }})
   export NODE_IP=$(kubectl get nodes --namespace {{ $global.namespace | default "dev" }} -o jsonpath="{.items[0].status.addresses[0].address}")

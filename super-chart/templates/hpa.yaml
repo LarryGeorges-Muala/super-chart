@@ -19,6 +19,7 @@
       {{- if hasKey . "autoscaling" }}
         {{- if hasKey .autoscaling "enabled" }}
           {{- if .autoscaling.enabled }}
+---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:

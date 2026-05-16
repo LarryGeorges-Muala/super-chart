@@ -16,6 +16,7 @@
 {{- if hasKey .Values "deployments" }}
   {{- range $deployment := .Values.deployments }}
     {{- with $deployment }}
+---
 apiVersion: apps/v1
 kind: {{ .kind | default "Deployment" }}
 metadata:

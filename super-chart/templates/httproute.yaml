@@ -22,7 +22,8 @@
             {{- $svcPort := .service.port -}}
             {{- if hasKey . "httpRoute" }}
               {{- if hasKey .httpRoute "enabled" }}
-                {{- if .httpRoute.enabled -}}
+                {{- if .httpRoute.enabled }}
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
