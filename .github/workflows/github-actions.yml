@@ -7,9 +7,6 @@ on:
 jobs:
   Helm-Lint:
     runs-on: 'ubuntu-24.04'
-    env:
-      TEST_NAME: "helm"
-      HELM_SET: "--set fullnameOverride={{ env.TEST_NAME }} --set deployments[0].name={{ env.TEST_NAME }} --set deployments[0].containers[0].name={{ env.TEST_NAME }}"
     steps:
       - name: Testing environment prep
         run: |
@@ -27,26 +24,14 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v6
 
-      # - name: Set Multiline Env Var
-      #   run: |
-      #     {
-      #       echo "HELM_SET<<EOF"
-      #       echo "--set fullnameOverride={{ env.TEST_NAME }}"
-      #       echo "--set deployments[0].name={{ env.TEST_NAME }}"
-      #       echo "--set deployments[0].containers[0].name={{ env.TEST_NAME }}"
-      #       echo "EOF"
-      #     } >> "$GITHUB_ENV"
-
       - name: Lint - Chart
         run: |
           helm package ./super-chart --destination .;
-          export HELM_SET={{ var.HELM_SET }};
-          find ./super-chart -name "*super-chart*.tgz" -exec helm lint --strict env HELM_SET {} \;
-          find ./super-chart -name "*super-chart*.tgz" -exec helm template env HELM_SET --debug {} \;
+          find ./super-chart -name "*super-chart*.tgz" -exec helm lint --strict --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm {} \;
+          find ./super-chart -name "*super-chart*.tgz" -exec helm template --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm --debug {} \;
           find ./super-chart -name "*super-chart*.tgz" -exec rm -rf {} \;
 
       - name: Lint - Published Charts
         run: |
-          export HELM_SET={{ var.HELM_SET }};
-          find ./docs -name "*super-chart*.tgz" -exec helm lint --strict env HELM_SET {} \;
-          find ./docs -name "*super-chart*.tgz" -exec helm template env HELM_SET --debug {} \;
+          find ./docs -name "*super-chart*.tgz" -exec helm lint --strict --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm {} \;
+          find ./docs -name "*super-chart*.tgz" -exec helm template --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm --debug {} \;
