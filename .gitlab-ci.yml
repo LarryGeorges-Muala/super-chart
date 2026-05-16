@@ -1,0 +1,26 @@
+stages:
+  - lint
+
+default:
+  image: ubuntu:24.04
+
+helm_lint:
+  stage: lint
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: false
+  script:
+    - echo 'Starting env prep for testing...'
+    - apt-get install curl gpg apt-transport-https --yes
+    - curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null
+    - echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
+    - apt-get update
+    - apt-get install helm
+    - helm version
+    - helm package ./super-chart --destination .
+    - find ./super-chart -name "*super-chart*.tgz" -exec helm lint --strict {} \;
+    - find ./super-chart -name "*super-chart*.tgz" -exec helm template --debug {} \;
+    - find ./super-chart -name "*super-chart*.tgz" -exec rm -rf {} \;
+    - find ./docs -name "*super-chart*.tgz" -exec helm lint --strict {} \;
+    - find ./docs -name "*super-chart*.tgz" -exec helm template --debug {} \;

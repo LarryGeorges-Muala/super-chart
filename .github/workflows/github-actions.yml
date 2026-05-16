@@ -1,0 +1,37 @@
+name: Test
+run-name: ${{ github.actor }} Linting Super-Chart 🚀
+on:
+  push:
+    branches:
+      - main
+jobs:
+  Helm-Lint:
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - name: Testing environment prep
+        run: |
+          echo 'Starting env prep for testing...';
+          sudo apt-get install curl gpg apt-transport-https --yes;
+
+      - name: Helm - Installation
+        run: |
+          curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null;
+          echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list;
+          sudo apt-get update;
+          sudo apt-get install helm;
+          helm version;
+
+      - name: Check out repository code
+        uses: actions/checkout@v6
+
+      - name: Lint - Chart
+        run: |
+          helm package ./super-chart --destination .;
+          find ./super-chart -name "*super-chart*.tgz" -exec helm lint --strict {} \;
+          find ./super-chart -name "*super-chart*.tgz" -exec helm template --debug {} \;
+          find ./super-chart -name "*super-chart*.tgz" -exec rm -rf {} \;
+
+      - name: Lint - Published Charts
+        run: |
+          find ./docs -name "*super-chart*.tgz" -exec helm lint --strict {} \;
+          find ./docs -name "*super-chart*.tgz" -exec helm template --debug {} \;
