@@ -14,15 +14,15 @@
   TEMPLATE
 */}}
 {{- if hasKey .Values "deployments" }}
-  {{- range .Values.deployments }}
-    {{- $deployment := . -}}
+  {{- range $deployment := .Values.deployments }}
+    {{- with $deployment }}
     {{- if hasKey . "containers" }}
-      {{- range .containers }}
-        {{- $container := . -}}
-        {{- $svcPort := .service.port -}}
-        {{- if hasKey . "ingress" }}
-          {{- if hasKey .ingress "enabled" }}
-            {{- if .ingress.enabled -}}
+      {{- range $container := .containers }}
+        {{- with $container }}
+          {{- $svcPort := .service.port -}}
+          {{- if hasKey . "ingress" }}
+            {{- if hasKey .ingress "enabled" }}
+              {{- if .ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -73,6 +73,8 @@ spec:
                   number: {{ $svcPort }}
           {{- end }}
     {{- end }}
+                {{- end }}
+              {{- end }}
             {{- end }}
           {{- end }}
         {{- end }}

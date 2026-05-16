@@ -14,15 +14,14 @@
   TEMPLATE
 */}}
 {{- if hasKey .Values "deployments" }}
-  {{- range .Values.deployments }}
-    {{- $deployment := . -}}
-    {{- if hasKey . "containers" }}
-      {{- range .containers }}
-        {{- $container := . -}}
-        {{- $svcPort := .service.port -}}
-        {{- if hasKey . "service" }}
-          {{- if hasKey .service "enabled" }}
-            {{- if .service.enabled -}}
+  {{- range $deployment := .Values.deployments }}
+    {{- with $deployment }}
+      {{- if hasKey . "containers" }}
+        {{- range $container := .containers }}
+          {{- with $container }}
+            {{- if hasKey . "service" }}
+              {{- if hasKey .service "enabled" }}
+                {{- if .service.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -60,6 +59,8 @@ spec:
   selector:
     app.kubernetes.io/name: {{ $fullName }}{{ printf "-%s" $deployment.name }}
     app.kubernetes.io/instance: {{ $releaseName }}
+                {{- end }}
+              {{- end }}
             {{- end }}
           {{- end }}
         {{- end }}

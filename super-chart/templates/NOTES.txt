@@ -14,12 +14,11 @@
   TEMPLATE
 */}}
 {{- if hasKey .Values "deployments" }}
-  {{- range .Values.deployments }}
-    {{- $deployment := . -}}
-    {{- if hasKey . "containers" }}
-      {{- range .containers }}
-        {{- $container := . -}}
-        {{- $svcPort := .service.port -}}
+  {{- range $deployment := .Values.deployments }}
+    {{- with $deployment }}
+      {{- if hasKey . "containers" }}
+        {{- range $container := .containers }}
+          {{- with $container }}
 1. Get the application URL by running these commands:
 {{- if contains "NodePort" .service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ $global.namespace | default "dev" }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullName }})
@@ -36,6 +35,8 @@
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl --namespace {{ $global.namespace | default "dev" }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
+          {{- end }}
+        {{- end }}
       {{- end }}
     {{- end }}
   {{- end }}

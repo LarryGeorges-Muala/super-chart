@@ -14,15 +14,15 @@
   TEMPLATE
 */}}
 {{- if hasKey .Values "deployments" }}
-  {{- range .Values.deployments }}
-    {{- $deployment := . -}}
-    {{- if hasKey . "containers" }}
-      {{- range .containers }}
-        {{- $container := . -}}
-        {{- $svcPort := .service.port -}}
-        {{- if hasKey . "httpRoute" }}
-          {{- if hasKey .httpRoute "enabled" }}
-            {{- if .httpRoute.enabled -}}
+  {{- range $deployment := .Values.deployments }}
+    {{- with $deployment }}
+      {{- if hasKey . "containers" }}
+        {{- range $container := .containers }}
+          {{- with $container }}
+            {{- $svcPort := .service.port -}}
+            {{- if hasKey . "httpRoute" }}
+              {{- if hasKey .httpRoute "enabled" }}
+                {{- if .httpRoute.enabled -}}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -70,6 +70,8 @@ spec:
           port: {{ $svcPort }}
           weight: 1
     {{- end }}
+                {{- end }}
+              {{- end }}
             {{- end }}
           {{- end }}
         {{- end }}

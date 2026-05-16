@@ -14,11 +14,11 @@
   TEMPLATE
 */}}
 {{- if hasKey .Values "deployments" }}
-  {{- range .Values.deployments }}
-    {{- $deployment := . -}}
-    {{- if hasKey . "autoscaling" }}
-      {{- if hasKey .autoscaling "enabled" }}
-        {{- if .autoscaling.enabled }}
+  {{- range $deployment := .Values.deployments }}
+    {{- with $deployment }}
+      {{- if hasKey . "autoscaling" }}
+        {{- if hasKey .autoscaling "enabled" }}
+          {{- if .autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -56,6 +56,7 @@ spec:
           type: Utilization
           averageUtilization: {{ .autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+          {{- end }}
         {{- end }}
       {{- end }}
     {{- end }}
