@@ -53,13 +53,17 @@ spec:
   {{- end }}
   rules:
     {{- range .httpRoute.rules }}
+      {{- if hasKey . "matches" }}
       {{- with .matches }}
     - matches:
       {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- end }}
+      {{- if hasKey . "filters" }}
       {{- with .filters }}
       filters:
       {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- end }}
       backendRefs:
         - name: {{ $fullName }}{{ printf "-%s" $deployment.name }}{{ printf "-%s" $container.name }}

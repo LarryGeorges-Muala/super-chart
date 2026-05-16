@@ -26,12 +26,12 @@ jobs:
 
       - name: Lint - Chart
         run: |
-          helm package ./super-chart --destination .;
-          find ./super-chart -name "*super-chart*.tgz" -exec helm lint --strict --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm {} \;
-          find ./super-chart -name "*super-chart*.tgz" -exec helm template --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm --debug {} \;
-          find ./super-chart -name "*super-chart*.tgz" -exec rm -rf {} \;
+          helm package ./super-chart --destination ./release;
+          find ./release -name "*super-chart*.tgz" -exec helm lint --strict --values values-tests.yaml {} \;
+          find ./release -name "*super-chart*.tgz" -exec helm template --debug --values values-tests.yaml {} \;
+          find ./release -name "*super-chart*.tgz" -exec rm -rf {} \;
 
       - name: Lint - Published Charts
         run: |
-          find ./docs -name "*super-chart*.tgz" -exec helm lint --strict --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm {} \;
-          find ./docs -name "*super-chart*.tgz" -exec helm template --set fullnameOverride=helm --set deployments[0].name=helm --set deployments[0].containers[0].name=helm --debug {} \;
+          find ./docs -name "*super-chart*.tgz" -exec helm lint --strict --values values-tests.yaml {} \;
+          find ./docs -name "*super-chart*.tgz" -exec helm template --debug --values values-tests.yaml {} \;

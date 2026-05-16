@@ -20,47 +20,22 @@
       {{- range .containers }}
         {{- $container := . -}}
         {{- $svcPort := .service.port -}}
-
 1. Get the application URL by running these commands:
-{{- if .httpRoute.enabled }}
-  {{- if .httpRoute.hostnames }}
-    export APP_HOSTNAME={{ .httpRoute.hostnames | first }}
-  {{- else }}
-    export APP_HOSTNAME=$(kubectl get --namespace {{(first .httpRoute.parentRefs).namespace | default ($global.namespace | default "dev") }} gateway/{{ (first .httpRoute.parentRefs).name }} -o jsonpath="{.spec.listeners[0].hostname}")
-  {{- end }}
-  {{- if and .httpRoute.rules (first .httpRoute.rules).matches (first (first .httpRoute.rules).matches).path.value }}
-    echo "Visit http://$APP_HOSTNAME{{ (first (first .httpRoute.rules).matches).path.value }} to use your application"
-
-    NOTE: Your HTTPRoute depends on the listener configuration of your gateway and your HTTPRoute rules.
-    The rules can be set for path, method, header and query parameters.
-    You can check the gateway configuration with 'kubectl get --namespace {{(first .httpRoute.parentRefs).namespace | default ($global.namespace | default "dev") }} gateway/{{ (first .httpRoute.parentRefs).name }} -o yaml'
-  {{- end }}
-
-{{- else if .ingress.enabled }}
-  {{- range $host := .ingress.hosts }}
-    {{- range .paths }}
-  http{{ if $container.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
-    {{- end }}
-  {{- end }}
-
-{{- else if contains "NodePort" .service.type }}
+{{- if contains "NodePort" .service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ $global.namespace | default "dev" }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullName }})
   export NODE_IP=$(kubectl get nodes --namespace {{ $global.namespace | default "dev" }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
-
 {{- else if contains "LoadBalancer" .service.type }}
      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
            You can watch its status by running 'kubectl get --namespace {{ $global.namespace | default "dev" }} svc -w {{ $fullName }}'
   export SERVICE_IP=$(kubectl get svc --namespace {{ $global.namespace | default "dev" }} {{ $fullName }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
   echo http://$SERVICE_IP:{{ .service.port }}
-
 {{- else if contains "ClusterIP" .service.type }}
   export POD_NAME=$(kubectl get pods --namespace {{ $global.namespace | default "dev" }} -l "app.kubernetes.io/name={{ $appName }},app.kubernetes.io/instance={{ $releaseName }}" -o jsonpath="{.items[0].metadata.name}")
   export CONTAINER_PORT=$(kubectl get pod --namespace {{ $global.namespace | default "dev" }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl --namespace {{ $global.namespace | default "dev" }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
-
       {{- end }}
     {{- end }}
   {{- end }}
