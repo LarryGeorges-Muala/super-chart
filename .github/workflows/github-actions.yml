@@ -40,11 +40,13 @@ jobs:
       - name: Lint - Chart
         run: |
           helm package ./super-chart --destination .;
+          export HELM_SET={{ var.HELM_SET }};
           find ./super-chart -name "*super-chart*.tgz" -exec helm lint --strict env HELM_SET {} \;
           find ./super-chart -name "*super-chart*.tgz" -exec helm template env HELM_SET --debug {} \;
           find ./super-chart -name "*super-chart*.tgz" -exec rm -rf {} \;
 
       - name: Lint - Published Charts
         run: |
+          export HELM_SET={{ var.HELM_SET }};
           find ./docs -name "*super-chart*.tgz" -exec helm lint --strict env HELM_SET {} \;
           find ./docs -name "*super-chart*.tgz" -exec helm template env HELM_SET --debug {} \;
