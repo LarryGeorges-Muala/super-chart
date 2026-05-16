@@ -12,3 +12,5 @@ dependencies:
 ```
 
 > Global config to use in [values.yaml](super-chart/values.yaml)
+
+> Helm version >= 3.0.0
