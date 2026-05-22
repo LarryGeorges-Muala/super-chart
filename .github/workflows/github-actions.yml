@@ -35,3 +35,32 @@ jobs:
         run: |
           find ./docs -name "*super-chart*.tgz" -exec helm lint --strict --values values-tests.yaml {} \;
           find ./docs -name "*super-chart*.tgz" -exec helm template --debug --values values-tests.yaml {} \;
+
+
+  Vulnerabilities-Trivy:
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - name: Vulnerabilities-Trivy
+        run: |
+          echo 'Starting env prep for testing...'
+          sudo apt update && sudo apt install -y gnupg curl wget unzip ca-certificates
+          sudo wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          sudo echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy -y
+          trivy fs ${{ github.workspace }} --include-dev-deps --dependency-tree
+
+
+  Vulnerabilities-SBOM-Syft-Grype:
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - name: Vulnerabilities-SBOM-Syft-Grype
+        run: |
+          echo 'Starting env prep for testing...'
+          sudo apt update && sudo apt install -y gnupg curl wget unzip ca-certificates
+          sudo curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin
+          sudo curl -sSfL https://get.anchore.io/grype | sudo sh -s -- -b /usr/local/bin
+          rm -rf /scans || true
+          sudo mkdir /scans
+          sudo syft ${{ github.workspace }} -o cyclonedx-json=/scans/sbom.json
+          sudo grype sbom:/scans/sbom.json
