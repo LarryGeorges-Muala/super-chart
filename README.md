@@ -1,8 +1,13 @@
 # Super Chart
 
+## Description
+
 > Super Helm chart re-usable and configurable for multi-services
 
 > Handles multiple deployments and multiple containers per deployments
+
+
+## Setup
 
 ```Go
 dependencies:
@@ -14,3 +19,32 @@ dependencies:
 > Global config to use in [values.yaml](super-chart/values.yaml)
 
 > Helm version >= 3.0.0
+
+
+## CI/CD
+
+> GitHub: [github-actions.yml](.github/workflows/github-actions.yml)
+
+> GitLab: [.gitlab-ci.yml](.gitlab-ci.yml)
+
+
+## DevSecOps
+
+> Jenkins Container: [compose.yaml](compose.yaml) / [jenkins.Dockerfile](jenkins.Dockerfile)
+
+> Jenkins Pipeline with Vulnerability Scanner, SBOM and SAST: [Jenkinsfile](Jenkinsfile)
+
+> Docker Local Vulnerability Scanner, SBOM and SAST Container: [compose.yaml](compose.yaml) / [vulnerabilities.Dockerfile](vulnerabilities.Dockerfile)
+
+- Vulnerability Scanner: [Trivy](https://github.com/aquasecurity/trivy)
+
+- SBOM: [Syft](https://github.com/anchore/syft) / [Grype](https://github.com/anchore/grype)
+
+- SAST: [Semgrep](https://github.com/semgrep/semgrep)
+
+
+## Components
+
+1. [Templates](super-chart/)
+2. [Chart Repository / GitHub Page](docs/)
+3. [Test File / Linting File (values-tests.yaml)](values-tests.yaml)
