@@ -6,6 +6,15 @@
 
 > Handles multiple deployments and multiple containers per deployments
 
+---
+
+## Components
+
+1. [Templates](super-chart/)
+2. [Chart Repository / GitHub Page](docs/)
+3. [Test File / Linting File (values-tests.yaml)](values-tests.yaml)
+
+---
 
 ## Setup
 
@@ -20,6 +29,7 @@ dependencies:
 
 > Helm version >= 3.0.0
 
+---
 
 ## CI/CD
 
@@ -27,6 +37,7 @@ dependencies:
 
 > GitLab: [.gitlab-ci.yml](.gitlab-ci.yml)
 
+---
 
 ## DevSecOps
 
@@ -42,9 +53,35 @@ dependencies:
 
 - SAST: [Semgrep](https://github.com/semgrep/semgrep)
 
+---
 
-## Components
+## IaC Config Tooling
 
-1. [Templates](super-chart/)
-2. [Chart Repository / GitHub Page](docs/)
-3. [Test File / Linting File (values-tests.yaml)](values-tests.yaml)
+> Ansible Inventory: [.ansible/inventory/docker_hosts.ini](.ansible/inventory/docker_hosts.ini)
+
+> Ansible Vulnerabilities Playbook: [.ansible/playbooks/vulnerabilities_local_scan.yaml](.ansible/playbooks/vulnerabilities_local_scan.yaml)
+
+> Ansible Host Dockerfile: [vulnerabilities.Dockerfile](vulnerabilities.Dockerfile)
+
+> Ansible Host Orchestration: [compose.yaml](compose.yaml)
+
+> Ansible Python3.12+ Requirements: [ansible/ansible-requirements.txt](ansible/ansible-requirements.txt)
+
+```bash
+docker compose up --build --no-deps --force-recreate --remove-orphans
+
+python3 -m venv ./.ansible/.venv-ansible
+
+source ./.ansible/.venv-ansible/bin/activate
+
+python3 -m pip install -r ./.ansible/ansible-requirements.txt
+
+ansible-inventory -i ./.ansible/inventory/docker_hosts.ini --list
+
+ansible-playbook -i ./.ansible/inventory/docker_hosts.ini ./.ansible/playbooks/vulnerabilities_local_scan.yaml
+
+deactivate
+
+rm -rf ./.ansible/.venv-ansible
+```
+
