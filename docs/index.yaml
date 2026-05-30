@@ -3,7 +3,20 @@ entries:
   super-chart:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-05-30T18:09:10.251982+04:00"
+    created: "2026-05-30T18:22:30.346505+04:00"
+    description: Super Helm chart re-usable and configurable for multi-services
+    digest: 967a49efffc617caa7564d910acdc36377490eee14b97036c3f83f4150e82097
+    icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
+    name: super-chart
+    sources:
+    - https://github.com/LarryGeorges-Muala/super-chart
+    type: application
+    urls:
+    - https://larrygeorges-muala.github.io/chart/super-chart-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2026-05-30T18:22:30.346092+04:00"
     description: Super Helm chart re-usable and configurable for multi-services
     digest: 28823dfbbbb2a5fd26cfabf92c439b6b6663966033ec094cff772d78f5e7d62d
     icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
@@ -14,4 +27,4 @@ entries:
     urls:
     - https://larrygeorges-muala.github.io/chart/super-chart-0.1.1.tgz
     version: 0.1.1
-generated: "2026-05-30T18:09:10.251342+04:00"
+generated: "2026-05-30T18:22:30.345376+04:00"
