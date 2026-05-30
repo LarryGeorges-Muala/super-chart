@@ -99,9 +99,6 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- end }}
-      {{- if eq .kind "DaemonSet" }}
-      priorityClassName: important
-      {{- end }}
       terminationGracePeriodSeconds: 30
       {{- if hasKey . "containers" }}
       containers:
