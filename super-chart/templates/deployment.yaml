@@ -100,6 +100,12 @@ spec:
         {{- end }}
       {{- end }}
       terminationGracePeriodSeconds: 30
+      {{- if hasKey . "initContainers" }}
+        {{- with .initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
       {{- if hasKey . "containers" }}
       containers:
         {{- range .containers }}

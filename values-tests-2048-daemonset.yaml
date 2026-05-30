@@ -16,6 +16,17 @@ deployments:
   - name: "backend"
     kind: DaemonSet
     replicaCount: 1
+    initContainers:
+      - name: init
+        image: busybox:latest
+        command: ["sh", "-c", "chown 10001:10001 /var/tempo"]
+        volumeMounts:
+          - mountPath: /var/tempo
+            name: data-volume
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+          runAsNonRoot: false
     containers:
       - name: "api"
         startup:
