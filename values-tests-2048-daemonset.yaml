@@ -51,9 +51,13 @@ deployments:
           type: ClusterIP
           port: 80
           extraPorts:
-            - name: https
-              enabled: false
-              port: 443
+            - name: oltp
+              enabled: true
+              port: 4317
+              protocol: TCP
+            - name: delve
+              enabled: true
+              port: 2345
               protocol: TCP
           annotations:
             service.beta.kubernetes.io/aws-load-balancer-type: external

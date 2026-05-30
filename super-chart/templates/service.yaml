@@ -47,12 +47,14 @@ spec:
   ports:
     - port: {{ .service.port }}
       targetPort: http
+      name: http
     {{- if hasKey .service "extraPorts" }}
       {{- range .service.extraPorts }}
         {{- if hasKey . "enabled" }}
           {{- if .enabled }}
     - port: {{ .port }}
       targetPort: {{ .port }}
+      name: {{ .name }}
           {{- end }}
         {{- end }}
       {{- end }}
