@@ -86,7 +86,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ $fullName }}{{ printf "-%s" .name }}
+      serviceAccountName: {{ .serviceAccount.name | default (printf "%s-%s" $fullName .name) }}
       {{- if hasKey . "podSecurityContext" }}
         {{- with .podSecurityContext }}
       securityContext:
