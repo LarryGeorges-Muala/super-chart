@@ -34,13 +34,19 @@ spec:
   {{- if hasKey . "autoscaling" }}
     {{- if hasKey .autoscaling "enabled" }}
       {{- if not .autoscaling.enabled }}
+        {{- if ne .kind "DaemonSet" }}
   replicas: {{ .replicaCount }}
+        {{- end }}
       {{- end }}
     {{- else }}
+      {{- if ne .kind "DaemonSet" }}
   replicas: {{ .replicaCount }}
+      {{- end }}
     {{- end }}
   {{- else }}
+    {{- if ne .kind "DaemonSet" }}
   replicas: {{ .replicaCount }}
+    {{- end }}
   {{- end }}
   selector:
     matchLabels:
@@ -92,6 +98,9 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- end }}
+      {{- if eq .kind "DaemonSet" }}
+      priorityClassName: important
       {{- end }}
       terminationGracePeriodSeconds: 30
       {{- if hasKey . "containers" }}
@@ -181,6 +190,7 @@ spec:
       {{- if hasKey . "affinity" }}
         {{- if hasKey .affinity "enabled" }}
           {{- if .affinity.enabled }}
+            {{- if ne .kind "DaemonSet" }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -191,6 +201,7 @@ spec:
                     values:
                       - {{ $fullName }}{{ printf "-%s" .name }}
               topologyKey: "kubernetes.io/hostname"
+            {{- end }}
           {{- end }}
         {{- end }}
       {{- end }}
