@@ -10,7 +10,13 @@ nameOverride: ""
 
 fullnameOverride: "game-2048"
 
-secrets: []
+secrets:
+  - name: env-secret
+    type: env
+    variables:
+      environment: DEV
+      ALLOY_OTLP_UPSTREAM: tempo:4317
+      ALLOY_OTLP_LOGS_UPSTREAM: "http://loki:3100/otlp"
 
 deployments:
   - name: "backend"
@@ -29,6 +35,9 @@ deployments:
           runAsNonRoot: false
     containers:
       - name: "api"
+        envFrom:
+          - secretRef:
+              name: env-secret
         startup:
           enabled: false
           command: []

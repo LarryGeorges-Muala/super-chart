@@ -118,6 +118,12 @@ spec:
           {{- end }}
           image: "{{ .image.repository }}:{{ .image.tag | default $chartVersion }}"
           imagePullPolicy: {{ .image.pullPolicy | default "IfNotPresent" }}
+          {{- if hasKey . "envFrom" }}
+            {{- with .envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- if hasKey . "startup" }}
             {{- if hasKey .startup "enabled" }}
               {{- if .startup.enabled }}
