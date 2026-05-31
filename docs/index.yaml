@@ -3,9 +3,9 @@ entries:
   super-chart:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-05-31T04:06:11.495388+04:00"
+    created: "2026-05-31T04:12:37.647228+04:00"
     description: Super Helm chart re-usable and configurable for multi-services
-    digest: 82cb1a8f986de4a1e22fab2e91c5272ed5c45f65b5ac006b6fcdeb4e505d3e66
+    digest: bc8d8f70f4020ea4fb3e5044c558e98a998f5b23493198ff2bcc3636e8f02721
     icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
     name: super-chart
     sources:
@@ -16,7 +16,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-05-31T04:06:11.495055+04:00"
+    created: "2026-05-31T04:12:37.646748+04:00"
     description: Super Helm chart re-usable and configurable for multi-services
     digest: 628d271e819022e85e01a3338d719c8804464b8b7eaf28d6ea05aecdb44fa34c
     icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
@@ -29,7 +29,7 @@ entries:
     version: 0.1.4
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-05-31T04:06:11.494394+04:00"
+    created: "2026-05-31T04:12:37.646209+04:00"
     description: Super Helm chart re-usable and configurable for multi-services
     digest: 9c0a797731cdff1474ab4b3a829ad0c45fa7c79a61698f5233520ccb1ff3c944
     icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
@@ -42,7 +42,7 @@ entries:
     version: 0.1.3
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-05-31T04:06:11.493878+04:00"
+    created: "2026-05-31T04:12:37.644801+04:00"
     description: Super Helm chart re-usable and configurable for multi-services
     digest: 967a49efffc617caa7564d910acdc36377490eee14b97036c3f83f4150e82097
     icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
@@ -55,7 +55,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-05-31T04:06:11.492952+04:00"
+    created: "2026-05-31T04:12:37.644092+04:00"
     description: Super Helm chart re-usable and configurable for multi-services
     digest: 28823dfbbbb2a5fd26cfabf92c439b6b6663966033ec094cff772d78f5e7d62d
     icon: https://avatars.githubusercontent.com/u/23165247?v=4&size=64
@@ -66,4 +66,4 @@ entries:
     urls:
     - https://larrygeorges-muala.github.io/super-chart/super-chart-0.1.1.tgz
     version: 0.1.1
-generated: "2026-05-31T04:06:11.492134+04:00"
+generated: "2026-05-31T04:12:37.643237+04:00"

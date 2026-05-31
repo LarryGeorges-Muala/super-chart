@@ -53,7 +53,7 @@ spec:
         {{- if hasKey . "enabled" }}
           {{- if .enabled }}
     - port: {{ .port }}
-      targetPort: {{ .port }}
+      targetPort: {{ .targetPort | default .port }}
       name: {{ .name }}
           {{- end }}
         {{- end }}

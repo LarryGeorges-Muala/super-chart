@@ -68,6 +68,11 @@ deployments:
               enabled: true
               port: 2345
               protocol: TCP
+            - name: targ
+              enabled: true
+              port: 2346
+              targetPort: 2344
+              protocol: TCP
           annotations:
             service.beta.kubernetes.io/aws-load-balancer-type: external
             service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
